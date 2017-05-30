@@ -2,6 +2,6 @@
     <string name="app_name">VPN Client</string>
     <string name="tap_to_connect">Tap to connect</string>
     <string name="select_server">Select server</string>
-    <string name="sample_server">Amsterdam, NL</string>
+    <string name="updating_placeholder">Updating&#8230;</string>
     <string name="connected_to">Connected to</string>
 </resources>

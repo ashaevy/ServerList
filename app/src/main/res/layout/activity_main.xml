@@ -37,13 +37,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/button" />
+        android:id="@+id/btn_select_server" />
 
     <TextView
-        android:text="@string/sample_server"
+        android:text="@string/updating_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button"
+        android:layout_above="@+id/btn_select_server"
         android:layout_centerHorizontal="true"
         android:id="@+id/tv_selected_server"
         android:textAppearance="@android:style/TextAppearance.Large" />
