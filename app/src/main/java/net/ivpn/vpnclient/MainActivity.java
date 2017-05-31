@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements Observer<ServerIt
             // if there is no selected server
             // request data from ivpn service
             selectedServerTextView.setText(getString(R.string.updating_placeholder));
-            selectedServerViewModel.requestDataFromServer();
         }
     }
 }

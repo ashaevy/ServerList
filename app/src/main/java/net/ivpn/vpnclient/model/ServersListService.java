@@ -46,36 +46,42 @@ public class ServersListService extends IntentService {
     }
 
     private void requestServersList() throws java.io.IOException {
-        ServerItem selectedServer = db.serversListModel().loadSelected();
-        List<ServerItem> serversList = ivpnService.getServers().execute().body();
-        db.serversListModel().deleteAll();
-        db.serverIpsListModel().deleteAll();
-        boolean shouldUpdateSelectedServer = true;
-        for (ServerItem si : serversList) {
-            if (shouldUpdateSelectedServer) {
-                if (selectedServer == null) {
-                    // if no selected server - select first
-                    si.setSelected(true);
-                    shouldUpdateSelectedServer = false;
-                } else {
-                    if (selectedServer.getGateway().equals(si.getGateway())) {
+        db.beginTransaction();
+        try {
+            ServerItem selectedServer = db.serversListModel().loadSelected();
+            List<ServerItem> serversList = ivpnService.getServers().execute().body();
+            db.serversListModel().deleteAll();
+            db.serverIpsListModel().deleteAll();
+            boolean shouldUpdateSelectedServer = true;
+            for (ServerItem si : serversList) {
+                if (shouldUpdateSelectedServer) {
+                    if (selectedServer == null) {
+                        // if no selected server - select first
                         si.setSelected(true);
-                        shouldUpdateSelectedServer = true;
+                        shouldUpdateSelectedServer = false;
+                    } else {
+                        if (selectedServer.getGateway().equals(si.getGateway())) {
+                            si.setSelected(true);
+                            shouldUpdateSelectedServer = true;
+                        }
                     }
                 }
+                long serverId = db.serversListModel().insertServerItem(si);
+                List<String> ipAddresses = si.getIpAddresses();
+                for (String ipAddressString: ipAddresses) {
+                    ServerIp serverIp = new ServerIp();
+                    serverIp.setIp(ipAddressString);
+                    serverIp.setServerId((int) serverId);
+                    db.serverIpsListModel().insertServerIp(serverIp);
+                }
             }
-            long serverId = db.serversListModel().insertServerItem(si);
-            List<String> ipAddresses = si.getIpAddresses();
-            for (String ipAddressString: ipAddresses) {
-                ServerIp serverIp = new ServerIp();
-                serverIp.setIp(ipAddressString);
-                serverIp.setServerId((int) serverId);
-                db.serverIpsListModel().insertServerIp(serverIp);
-            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
     }
 
-    public void updateSelectedServer(int id) {
+    private void updateSelectedServer(int id) {
         ServerItem oldSelectedServer = db.serversListModel().loadSelected();
         ServerItem selectedServer = db.serversListModel().loadWithId(id);
         db.beginTransaction();
